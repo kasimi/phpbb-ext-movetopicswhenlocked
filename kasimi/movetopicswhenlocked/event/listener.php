@@ -116,8 +116,8 @@ class listener implements EventSubscriberInterface
 	{
 		if ($event['action'] == 'lock')
 		{
-			$topic_id = (int) current($topic_ids);
 			$topic_ids = $event['ids'];
+			$topic_id = (int) current($topic_ids);
 			$topic_data = $event['data'];
 			$forum_id = (int) $topic_data[$topic_id]['forum_id'];
 			$to_forum_id = (int) $topic_data[$topic_id]['move_topics_to'];
