@@ -21,5 +21,5 @@ if (empty($lang) || !is_array($lang))
 $lang = array_merge($lang, array(
 	'MOVE_TOPICS_WHEN_LOCKED'			=> 'Move locked topics automatically',
 	'MOVE_TOPICS_TO'					=> 'Move locked topics to',
-	'LOG_MOVED_LOCKED_TOPIC'			=> '<strong>Locked topic \'%s\' automatically moved</strong><br />&raquo; from %s<br />&raquo; to %s',
+	'LOG_MOVED_LOCKED_TOPIC'			=> '<strong>Locked topic “%s” automatically moved</strong><br />&raquo; from %s<br />&raquo; to %s',
 ));
