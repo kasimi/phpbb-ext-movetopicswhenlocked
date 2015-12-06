@@ -1,0 +1,24 @@
+{
+	"name": "kasimi/movetopicswhenlocked",
+	"type": "phpbb-extension",
+	"description": "This extension allows the administrator to configure a forum to automatically move closed topics to a designated forum.",
+	"homepage": "https://github.com/kasimi",
+	"version": "1.0.0",
+	"time": "2015-12-06",
+	"license": "GPL-2.0",
+	"authors": [{
+			"name": "kasimi",
+			"email": "",
+			"homepage": "https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=1330603",
+			"role": "Lead Developer"
+		}],
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"extra": {
+		"display-name": "Move Topics When Locked",
+		"soft-require": {
+			"phpbb/phpbb": ">=3.1.7-RC1"
+		}
+	}
+}

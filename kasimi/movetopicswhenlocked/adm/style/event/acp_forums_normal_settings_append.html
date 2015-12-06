@@ -1,0 +1,9 @@
+<dl>
+	<dt><label for="move_topic">{L_MOVE_TOPICS_WHEN_LOCKED}{L_COLON}</label><br /><span>{L_MOVE_TOPICS_WHEN_LOCKED_EXPLAIN}</span></dt>
+	<dd><label><input type="radio" class="radio" name="move_topic" value="1"<!-- IF S_MOVE_TOPIC --> id="move_topic" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+		<label><input type="radio" class="radio" name="move_topic" value="0"<!-- IF not S_MOVE_TOPIC --> id="move_topic" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+</dl>
+<dl>
+	<dt><label for="move_topics_to">{L_MOVE_TOPICS_TO}{L_COLON}</label><br /><span>{L_MOVE_TOPICS_TO_EXPLAIN}</span></dt>
+	<dd><select id="move_topics_to" name="move_topics_to">{S_MOVE_TOPICS_TO_OPTIONS}</select></dd>
+</dl>

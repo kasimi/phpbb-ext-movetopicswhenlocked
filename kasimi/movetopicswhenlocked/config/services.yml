@@ -1,0 +1,13 @@
+services:
+    kasimi.movetopicswhenlocked.listener:
+        class: kasimi\movetopicswhenlocked\event\listener
+        arguments:
+            - @user
+            - @request
+            - @dbal.conn
+            - @template
+            - @log
+            - %core.root_path%
+            - %core.php_ext%
+        tags:
+            - { name: event.listener }
