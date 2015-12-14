@@ -3,8 +3,8 @@
 	"type": "phpbb-extension",
 	"description": "This extension allows the administrator to configure a forum to automatically move closed topics to a designated forum.",
 	"homepage": "https://github.com/kasimi",
-	"version": "1.0.0",
-	"time": "2015-12-06",
+	"version": "1.0.1",
+	"time": "2015-12-14",
 	"license": "GPL-2.0",
 	"authors": [{
 			"name": "kasimi",

@@ -7,6 +7,7 @@ services:
             - @dbal.conn
             - @template
             - @log
+            - @config
             - %core.root_path%
             - %core.php_ext%
         tags:

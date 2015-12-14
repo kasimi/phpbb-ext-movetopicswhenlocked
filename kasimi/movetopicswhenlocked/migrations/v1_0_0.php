@@ -10,17 +10,22 @@
 
 namespace kasimi\movetopicswhenlocked\migrations;
 
-use \phpbb\db\migration\migration;
-
-class v1_0_0 extends migration
+class v1_0_0 extends \phpbb\db\migration\migration
 {
+	public function update_data()
+	{
+		return array(
+			array('config.add', array('kasimi.movetopicswhenlocked.version', '1.0.0')),
+		);
+	}
+
 	public function update_schema()
 	{
 		return array(
 			'add_columns' => array(
 				$this->table_prefix . 'forums' => array(
-					'move_topic'		=> array('TINT:1', 0),
-					'move_topics_to'	=> array('UINT', 0),
+					'move_topics_when_locked'		=> array('TINT:1', 0),
+					'move_topics_when_locked_to'	=> array('UINT', 0),
 				),
 			),
 		);
@@ -31,8 +36,8 @@ class v1_0_0 extends migration
 		return array(
 			'drop_columns' => array(
 				$this->table_prefix . 'forums'	=> array(
-					'move_topic',
-					'move_topics_to',
+					'move_topics_when_locked',
+					'move_topics_when_locked_to',
 				),
 			),
 		);

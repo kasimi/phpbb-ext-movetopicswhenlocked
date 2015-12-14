@@ -19,7 +19,7 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-	'MOVE_TOPICS_WHEN_LOCKED'			=> 'Sposta argomenti bloccati', // I suppressed 'automatically' for brevity sake
+	'MOVE_TOPICS'						=> 'Sposta argomenti bloccati', // I suppressed 'automatically' for brevity sake
 	'MOVE_TOPICS_TO'					=> 'Sposta argomenti bloccati in',
 	'LOG_MOVED_LOCKED_TOPIC'			=> '<strong>L’argomento bloccato “%s” è stato automaticamente spostato</strong><br />&raquo; da %s<br />&raquo; a %s',
 ));
