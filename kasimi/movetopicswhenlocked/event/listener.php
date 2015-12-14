@@ -29,6 +29,9 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\log\log_interface */
 	protected $log;
 
+	/** @var \phpbb\config\config */
+	protected $config;
+
 	/** @var string */
 	protected $root_path;
 
@@ -43,6 +46,7 @@ class listener implements EventSubscriberInterface
 	 * @param \phpbb\db\driver\driver_interface		$db
 	 * @param \phpbb\template\template				$template
 	 * @param \phpbb\log\log_interface				$log
+	 * @param \phpbb\config\config					$config
 	 * @param string								$root_path
 	 * @param string								$php_ext
 	 */
@@ -52,6 +56,7 @@ class listener implements EventSubscriberInterface
 		\phpbb\db\driver\driver_interface $db,
 		\phpbb\template\template $template,
 		\phpbb\log\log_interface $log,
+		\phpbb\config\config $config,
 		$root_path,
 		$php_ext
 	)
@@ -61,6 +66,7 @@ class listener implements EventSubscriberInterface
 		$this->db			= $db;
 		$this->template		= $template;
 		$this->log			= $log;
+		$this->config		= $config;
 		$this->root_path	= $root_path;
 		$this->php_ext 		= $php_ext;
 	}
@@ -85,8 +91,9 @@ class listener implements EventSubscriberInterface
 	{
 		$forum_data = $event['forum_data'];
 		$this->template->assign_vars(array(
-			'S_MOVE_TOPIC'					=> $forum_data['move_topic'],
-			'S_MOVE_TOPICS_TO_OPTIONS'		=> make_forum_select($forum_data['move_topics_to'], $forum_data['parent_id']),
+			'MOVE_TOPICS_WHEN_LOCKED_VERSION'	=> $this->config['kasimi.movetopicswhenlocked.version'],
+			'S_MOVE_TOPIC'						=> $forum_data['move_topics_when_locked'],
+			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($forum_data['move_topics_when_locked_to'], false, false, true),
 		));
 	}
 
@@ -95,10 +102,39 @@ class listener implements EventSubscriberInterface
 	 */
 	public function acp_manage_forums_request_data($event)
 	{
+		$move_topics = $this->request->variable('move_topics_when_locked', 0);
+		$move_topics_to = $this->request->variable('move_topics_when_locked_to', 0);
+
 		$event['forum_data'] = array_merge($event['forum_data'], array(
-			'move_topic'		=> $this->request->variable('move_topic', 0),
-			'move_topics_to'	=> $this->request->variable('move_topics_to', 0),
+			'move_topics_when_locked'		=> $move_topics,
+			'move_topics_when_locked_to'	=> $move_topics_to,
 		));
+
+		// Apply this forum's preferences to all sub-forums
+		if ($this->request->variable('move_topics_when_locked_subforums', 0))
+		{
+			$subforum_ids = array();
+			foreach (get_forum_branch($event['forum_data']['forum_id'], 'children', 'descending', false) as $subforum)
+			{
+				$subforum_ids[] = (int) $subforum['forum_id'];
+			}
+
+			if (!empty($subforum_ids))
+			{
+				$this->db->sql_transaction('begin');
+
+				foreach ($subforum_ids as $subforum_id)
+				{
+					$sql_ary = 'UPDATE ' . FORUMS_TABLE . '
+						SET move_topics_when_locked = ' . (int) $move_topics . ',
+							move_topics_when_locked_to = ' . (int) $move_topics_to . '
+						WHERE forum_id = ' . (int) $subforum_id;
+					$this->db->sql_query($sql_ary);
+				}
+
+				$this->db->sql_transaction('commit');
+			}
+		}
 	}
 
 	/**
@@ -116,13 +152,31 @@ class listener implements EventSubscriberInterface
 	{
 		if ($event['action'] == 'lock')
 		{
-			$topic_ids = $event['ids'];
-			$topic_id = (int) current($topic_ids);
 			$topic_data = $event['data'];
-			$forum_id = (int) $topic_data[$topic_id]['forum_id'];
-			$to_forum_id = (int) $topic_data[$topic_id]['move_topics_to'];
-			$forum_data = phpbb_get_forum_data($to_forum_id);
-			$to_forum_name = $forum_data[$to_forum_id]['forum_name'];
+			$first_topic_data = reset($topic_data);
+			$forum_id = (int) $first_topic_data['forum_id'];
+
+			// Forum settings are set to not move the topics
+			if (!$first_topic_data['move_topics_when_locked'])
+			{
+				return;
+			}
+
+			$to_forum_id = (int) $first_topic_data['move_topics_when_locked_to'];
+
+			// The topics are already in the destination forum
+			if ($forum_id == $to_forum_id)
+			{
+				return;
+			}
+
+			$to_forum_data = phpbb_get_forum_data($to_forum_id);
+
+			// The destination forum does not exist
+			if (empty($to_forum_data))
+			{
+				return;
+			}
 
 			$topics_moved = $topics_moved_unapproved = $topics_moved_softdeleted = 0;
 
@@ -149,7 +203,7 @@ class listener implements EventSubscriberInterface
 			{
 				include($this->root_path . 'includes/functions_admin.' . $this->php_ext);
 			}
-			move_topics($topic_ids, $to_forum_id, false);
+			move_topics(array_keys($topic_data), $to_forum_id, false);
 
 			foreach ($topic_data as $topic_id => $row)
 			{
@@ -160,7 +214,7 @@ class listener implements EventSubscriberInterface
 					'topic_id'		=> $topic_id,
 					$row['topic_title'],
 					$row['forum_name'],
-					$to_forum_name,
+					$to_forum_data[$to_forum_id]['forum_name'],
 				));
 			}
 			unset($topic_data);
