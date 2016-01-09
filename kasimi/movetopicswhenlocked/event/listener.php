@@ -154,15 +154,15 @@ class listener implements EventSubscriberInterface
 		{
 			$topic_data = $event['data'];
 			$first_topic_data = reset($topic_data);
-			$forum_id = (int) $first_topic_data['forum_id'];
+			$to_forum_id = (int) $first_topic_data['move_topics_when_locked_to'];
 
 			// Forum settings are set to not move the topics
-			if (!$first_topic_data['move_topics_when_locked'])
+			if (!$to_forum_id)
 			{
 				return;
 			}
 
-			$to_forum_id = (int) $first_topic_data['move_topics_when_locked_to'];
+			$forum_id = (int) $first_topic_data['forum_id'];
 
 			// The topics are already in the destination forum
 			if ($forum_id == $to_forum_id)
@@ -170,7 +170,7 @@ class listener implements EventSubscriberInterface
 				return;
 			}
 
-			$to_forum_data = phpbb_get_forum_data($to_forum_id);
+			$to_forum_data = phpbb_get_forum_data($to_forum_id, 'f_post');
 
 			// The destination forum does not exist
 			if (empty($to_forum_data))
@@ -178,7 +178,14 @@ class listener implements EventSubscriberInterface
 				return;
 			}
 
+			// Move topics, but do not resync yet
+			if (!function_exists('mcp_move_topic'))
+			{
+				include($this->root_path . 'includes/mpc/mpc_main.' . $this->php_ext);
+			}
+
 			$topics_moved = $topics_moved_unapproved = $topics_moved_softdeleted = 0;
+			$posts_moved = $posts_moved_unapproved = $posts_moved_softdeleted = 0;
 
 			foreach ($topic_data as $topic_id => $topic_info)
 			{
@@ -194,24 +201,33 @@ class listener implements EventSubscriberInterface
 				{
 					$topics_moved_softdeleted++;
 				}
+
+				$posts_moved += $topic_info['topic_posts_approved'];
+				$posts_moved_unapproved += $topic_info['topic_posts_unapproved'];
+				$posts_moved_softdeleted += $topic_info['topic_posts_softdeleted'];
 			}
 
 			$this->db->sql_transaction('begin');
 
-			// Move topics, but do not resync yet
 			if (!function_exists('move_topics'))
 			{
 				include($this->root_path . 'includes/functions_admin.' . $this->php_ext);
 			}
+
+			// Move topics, but do not resync yet
 			move_topics(array_keys($topic_data), $to_forum_id, false);
 
+			$forum_ids = array($to_forum_id);
 			foreach ($topic_data as $topic_id => $row)
 			{
+				// Get the list of forums to resync
+				$forum_ids[] = $row['forum_id'];
+
 				// We add the $to_forum_id twice, because 'forum_id' is updated
 				// when the topic is moved again later.
 				$this->log->add('mod', $this->user->data['user_id'], $this->user->ip, 'LOG_MOVED_LOCKED_TOPIC', false, array(
-					'forum_id'		=> $to_forum_id,
-					'topic_id'		=> $topic_id,
+					'forum_id'		=> (int) $to_forum_id,
+					'topic_id'		=> (int) $topic_id,
 					$row['topic_title'],
 					$row['forum_name'],
 					$to_forum_data[$to_forum_id]['forum_name'],
@@ -220,6 +236,22 @@ class listener implements EventSubscriberInterface
 			unset($topic_data);
 
 			$sync_sql = array();
+			if ($posts_moved)
+			{
+				$sync_sql[$to_forum_id][] = 'forum_posts_approved = forum_posts_approved + ' . (int) $posts_moved;
+				$sync_sql[$forum_id][] = 'forum_posts_approved = forum_posts_approved - ' . (int) $posts_moved;
+			}
+			if ($posts_moved_unapproved)
+			{
+				$sync_sql[$to_forum_id][] = 'forum_posts_unapproved = forum_posts_unapproved + ' . (int) $posts_moved_unapproved;
+				$sync_sql[$forum_id][] = 'forum_posts_unapproved = forum_posts_unapproved - ' . (int) $posts_moved_unapproved;
+			}
+			if ($posts_moved_softdeleted)
+			{
+				$sync_sql[$to_forum_id][] = 'forum_posts_softdeleted = forum_posts_softdeleted + ' . (int) $posts_moved_softdeleted;
+				$sync_sql[$forum_id][] = 'forum_posts_softdeleted = forum_posts_softdeleted - ' . (int) $posts_moved_softdeleted;
+			}
+
 			if ($topics_moved)
 			{
 				$sync_sql[$to_forum_id][] = 'forum_topics_approved = forum_topics_approved + ' . (int) $topics_moved;
