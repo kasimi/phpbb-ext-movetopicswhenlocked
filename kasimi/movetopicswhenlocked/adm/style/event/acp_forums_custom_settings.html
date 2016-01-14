@@ -2,13 +2,24 @@
 	<fieldset>
 		<legend>{L_MOVE_TOPICS_WHEN_LOCKED} v{MOVE_TOPICS_WHEN_LOCKED_VERSION}</legend>
 		<dl>
-			<dt><label for="move_topic">{L_MOVE_TOPICS}{L_COLON}</label></dt>
-			<dd><label><input type="radio" class="radio" name="move_topics_when_locked" value="1"<!-- IF S_MOVE_TOPIC --> id="move_topics_when_locked" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
-				<label><input type="radio" class="radio" name="move_topics_when_locked" value="0"<!-- IF not S_MOVE_TOPIC --> id="move_topics_when_locked" checked="checked"<!-- ENDIF --> /> {L_NO}</label></dd>
+			<dt><label for="move_topics_when_locked">{L_MOVE_TOPICS}{L_COLON}</label></dt>
+			<dd>
+				<label><input type="radio" class="radio" name="move_topics_when_locked" value="1"<!-- IF S_MOVE_TOPICS --> id="move_topics_when_locked" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked" value="0"<!-- IF not S_MOVE_TOPICS --> id="move_topics_when_locked" checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
+		</dl>
+		<dl>
+			<dt><label for="move_topics_when_locked_solved">{L_MOVE_TOPICS_SOLVED}{L_COLON}</label><br /><span>{L_MOVE_TOPICS_SOLVED_EXPLAIN}</span></dt>
+			<dd>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="1"<!-- IF S_MOVE_TOPICS_SOLVED --> id="move_topics_when_locked_solved" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="0"<!-- IF not S_MOVE_TOPICS_SOLVED --> id="move_topics_when_locked_solved" checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+			</dd>
 		</dl>
 		<dl>
 			<dt><label for="move_topics_when_locked_to">{L_MOVE_TOPICS_TO}{L_COLON}</label></dt>
-			<dd><select id="move_topics_when_locked_to" name="move_topics_when_locked_to">{S_MOVE_TOPICS_TO_OPTIONS}</select></dd>
+			<dd>
+				<select id="move_topics_when_locked_to" name="move_topics_when_locked_to">{S_MOVE_TOPICS_TO_OPTIONS}</select>
+			</dd>
 		</dl>
 		<dl>
 			<dt><label>{L_MOVE_TOPICS_APPLY_TO_SUBFORUMS}{L_COLON}</label><br /><span>{L_MOVE_TOPICS_APPLY_TO_SUBFORUMS_EXPLAIN}</span></dt>

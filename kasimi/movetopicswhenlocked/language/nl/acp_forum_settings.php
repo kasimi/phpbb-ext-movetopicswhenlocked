@@ -19,5 +19,6 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-	'LOG_MOVED_LOCKED_TOPIC'			=> '<strong>El tema cerrado “%s” ha sido movido automáticamente</strong><br />&raquo; de %s<br />&raquo; a %s',
+	'MOVE_TOPICS'						=> 'Verplaats gesloten onderwerpen automatisch',
+	'MOVE_TOPICS_TO'					=> 'Verplaats gesloten onderwerpen naar',
 ));

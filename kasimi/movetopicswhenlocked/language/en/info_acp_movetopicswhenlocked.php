@@ -19,10 +19,5 @@ if (empty($lang) || !is_array($lang))
 }
 
 $lang = array_merge($lang, array(
-	'MOVE_TOPICS_WHEN_LOCKED'					=> 'Move Topics When Locked',
-	'MOVE_TOPICS'								=> 'Move locked topics automatically',
-	'MOVE_TOPICS_TO'							=> 'Move locked topics to',
-	'MOVE_TOPICS_APPLY_TO_SUBFORUMS'			=> 'Apply these options to all sub-forums',
-	'MOVE_TOPICS_APPLY_TO_SUBFORUMS_EXPLAIN'	=> 'If set to “Yes”, the above preferences are applied to this forum and all sub-forums (and their sub-forums).',
 	'LOG_MOVED_LOCKED_TOPIC'					=> '<strong>Locked topic “%s” automatically moved</strong><br />&raquo; from %s<br />&raquo; to %s',
 ));
