@@ -6,12 +6,14 @@
 	"version": "1.0.2",
 	"time": "2016-01-14",
 	"license": "GPL-2.0",
-	"authors": [{
+	"authors": [
+		{
 			"name": "kasimi",
 			"email": "",
 			"homepage": "https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=1330603",
 			"role": "Lead Developer"
-		}],
+		}
+	],
 	"require": {
 		"php": ">=5.3.3"
 	},
