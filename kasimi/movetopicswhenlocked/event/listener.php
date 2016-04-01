@@ -116,11 +116,13 @@ class listener implements EventSubscriberInterface
 		$move_solved_topics = $this->request->variable('move_topics_when_locked_solved', 0);
 		$move_topics_to = $this->request->variable('move_topics_when_locked_to', 0);
 
-		$event['forum_data'] = array_merge($event['forum_data'], array(
-			'move_topics_when_locked'			=> $move_topics,
-			'move_topics_when_locked_solved'	=> $move_solved_topics,
-			'move_topics_when_locked_to'		=> $move_topics_to,
-		));
+		$lock_options = array(
+			'move_topics_when_locked'			=> (int) $move_topics,
+			'move_topics_when_locked_solved'	=> (int) $move_solved_topics,
+			'move_topics_when_locked_to'		=> (int) $move_topics_to,
+		);
+
+		$event['forum_data'] = array_merge($event['forum_data'], $lock_options);
 
 		// Apply this forum's preferences to all sub-forums
 		if ($this->request->variable('move_topics_when_locked_subforums', 0))
@@ -133,19 +135,10 @@ class listener implements EventSubscriberInterface
 
 			if (!empty($subforum_ids))
 			{
-				$this->db->sql_transaction('begin');
-
-				foreach ($subforum_ids as $subforum_id)
-				{
-					$sql_ary = 'UPDATE ' . FORUMS_TABLE . '
-						SET move_topics_when_locked = ' . (int) $move_topics . ',
-							move_topics_when_locked_solved = ' . (int) $move_solved_topics . ',
-							move_topics_when_locked_to = ' . (int) $move_topics_to . '
-						WHERE forum_id = ' . (int) $subforum_id;
-					$this->db->sql_query($sql_ary);
-				}
-
-				$this->db->sql_transaction('commit');
+				$sql_ary = 'UPDATE ' . FORUMS_TABLE . '
+					SET ' . $this->db->sql_build_array('UPDATE', $lock_options) . '
+					WHERE ' . $this->db->sql_in_set('forum_id', $subforum_ids);
+				$this->db->sql_query($sql_ary);
 			}
 		}
 	}
