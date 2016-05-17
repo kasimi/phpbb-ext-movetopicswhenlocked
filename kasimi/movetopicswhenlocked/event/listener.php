@@ -278,7 +278,6 @@ class listener implements EventSubscriberInterface
 				$to_forum_data[$to_forum_id]['forum_name'],
 			));
 		}
-		unset($topic_data);
 
 		$sync_sql = array();
 		if ($posts_moved)
@@ -355,5 +354,7 @@ class listener implements EventSubscriberInterface
 			'posts_moved_softdeleted',
 		);
 		extract($this->dispatcher->trigger_event('kasimi.movetopicswhenlocked.move_topics_after', compact($vars)));
+
+		unset($topic_data);
 	}
 }
