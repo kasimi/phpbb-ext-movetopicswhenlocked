@@ -98,12 +98,14 @@ class listener implements EventSubscriberInterface
 	{
 		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'acp_forum_settings');
 
+		$is_edit = $event['action'] == 'edit';
 		$forum_data = $event['forum_data'];
+
 		$this->template->assign_vars(array(
 			'MOVE_TOPICS_WHEN_LOCKED_VERSION'	=> $this->config['kasimi.movetopicswhenlocked.version'],
-			'S_MOVE_TOPICS'						=> $forum_data['move_topics_when_locked'],
-			'S_MOVE_TOPICS_SOLVED'				=> $forum_data['move_topics_when_locked_solved'],
-			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($forum_data['move_topics_when_locked_to'], false, false, true),
+			'S_MOVE_TOPICS'						=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
+			'S_MOVE_TOPICS_SOLVED'				=> $is_edit ? $forum_data['move_topics_when_locked_solved'] : false,
+			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
 		));
 	}
 
@@ -125,7 +127,7 @@ class listener implements EventSubscriberInterface
 		$event['forum_data'] = array_merge($event['forum_data'], $lock_options);
 
 		// Apply this forum's preferences to all sub-forums
-		if ($this->request->variable('move_topics_when_locked_subforums', 0))
+		if ($event['action'] == 'edit' && $this->request->variable('move_topics_when_locked_subforums', 0))
 		{
 			$subforum_ids = array();
 			foreach (get_forum_branch($event['forum_data']['forum_id'], 'children', 'descending', false) as $subforum)
