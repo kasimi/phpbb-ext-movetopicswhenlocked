@@ -56,25 +56,25 @@ class listener implements EventSubscriberInterface
 	 */
 	public function __construct(
 		\phpbb\user $user,
-		\phpbb\request\request_interface $request,
-		\phpbb\db\driver\driver_interface $db,
-		\phpbb\template\template $template,
-		\phpbb\log\log_interface $log,
-		\phpbb\config\config $config,
-		\phpbb\event\dispatcher_interface $dispatcher,
-		$root_path,
-		$php_ext
+		\phpbb\request\request_interface			$request,
+		\phpbb\db\driver\driver_interface			$db,
+		\phpbb\template\template					$template,
+		\phpbb\log\log_interface					$log,
+		\phpbb\config\config						$config,
+		\phpbb\event\dispatcher_interface			$dispatcher,
+													$root_path,
+													$php_ext
 	)
 	{
-		$this->user 		= $user;
-		$this->request		= $request;
-		$this->db			= $db;
-		$this->template		= $template;
-		$this->log			= $log;
-		$this->config		= $config;
-		$this->dispatcher	= $dispatcher;
-		$this->root_path	= $root_path;
-		$this->php_ext 		= $php_ext;
+		$this->user 								= $user;
+		$this->request								= $request;
+		$this->db									= $db;
+		$this->template								= $template;
+		$this->log									= $log;
+		$this->config								= $config;
+		$this->dispatcher							= $dispatcher;
+		$this->root_path							= $root_path;
+		$this->php_ext 								= $php_ext;
 	}
 
 	/**
@@ -321,7 +321,7 @@ class listener implements EventSubscriberInterface
 		{
 			$sql = 'UPDATE ' . FORUMS_TABLE . '
 				SET ' . implode(', ', $array) . '
-				WHERE forum_id = ' . $forum_id_key;
+				WHERE forum_id = ' . (int) $forum_id_key;
 			$this->db->sql_query($sql);
 		}
 
