@@ -4,7 +4,7 @@
 	"description": "This extension allows the administrator to configure a forum to automatically move locked topics to a designated forum.",
 	"homepage": "https://github.com/kasimi",
 	"version": "1.0.3",
-	"time": "2016-04-01",
+	"time": "2016-05-29",
 	"license": "GPL-2.0",
 	"authors": [
 		{
