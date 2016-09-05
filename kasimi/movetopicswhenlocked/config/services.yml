@@ -3,6 +3,7 @@ services:
         class: kasimi\movetopicswhenlocked\event\listener
         arguments:
             - '@user'
+            - '@auth'
             - '@request'
             - '@dbal.conn'
             - '@template'

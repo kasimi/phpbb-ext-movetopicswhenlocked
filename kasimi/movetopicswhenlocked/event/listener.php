@@ -10,12 +10,16 @@
 
 namespace kasimi\movetopicswhenlocked\event;
 
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
 	/** @var \phpbb\user */
 	protected $user;
+
+	/** @var \phpbb\auth\auth */
+	protected $auth;
 
 	/** @var \phpbb\request\request_interface */
 	protected $request;
@@ -45,6 +49,7 @@ class listener implements EventSubscriberInterface
  	 * Constructor
 	 *
 	 * @param \phpbb\user							$user
+	 * @param \phpbb\auth\auth						$auth
 	 * @param \phpbb\request\request_interface		$request
 	 * @param \phpbb\db\driver\driver_interface		$db
 	 * @param \phpbb\template\template				$template
@@ -55,7 +60,8 @@ class listener implements EventSubscriberInterface
 	 * @param string								$php_ext
 	 */
 	public function __construct(
-		\phpbb\user $user,
+		\phpbb\user									$user,
+		\phpbb\auth\auth							$auth,
 		\phpbb\request\request_interface			$request,
 		\phpbb\db\driver\driver_interface			$db,
 		\phpbb\template\template					$template,
@@ -67,6 +73,7 @@ class listener implements EventSubscriberInterface
 	)
 	{
 		$this->user 								= $user;
+		$this->auth									= $auth;
 		$this->request								= $request;
 		$this->db									= $db;
 		$this->template								= $template;
@@ -87,12 +94,15 @@ class listener implements EventSubscriberInterface
 			'core.acp_manage_forums_request_data'		=> 'acp_manage_forums_request_data',
 			'core.modify_mcp_modules_display_option'	=> 'mcp_modify_mcp_modules_display_option',
 			'core.mcp_lock_unlock_after'				=> 'mcp_lock_unlock_after',
+			'core.posting_modify_submit_post_after'		=> 'posting_modify_submit_post_after',
 			'tierra.topicsolved.mark_solved_after'		=> 'topic_solved_after',
 		);
 	}
 
 	/**
 	 * Event: core.acp_manage_forums_display_form
+	 *
+	 * @param Event $event
 	 */
 	public function acp_manage_forums_display_form($event)
 	{
@@ -111,6 +121,8 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Event: core.acp_manage_forums_request_data
+	 *
+	 * @param Event $event
 	 */
 	public function acp_manage_forums_request_data($event)
 	{
@@ -147,14 +159,19 @@ class listener implements EventSubscriberInterface
 
 	/**
 	 * Event: core.modify_mcp_modules_display_option
+	 *
+	 * @param Event $event
 	 */
 	public function mcp_modify_mcp_modules_display_option($event)
 	{
+		// Add language for MCP log entries
 		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'info_acp_movetopicswhenlocked');
 	}
 
 	/**
 	 * Event: core.mcp_lock_unlock_after
+	 *
+	 * @param Event $event
 	 */
 	public function mcp_lock_unlock_after($event)
 	{
@@ -165,7 +182,28 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
+	 * Event: core.posting_modify_submit_post_after
+	 *
+	 * @param Event $event
+	 */
+	public function posting_modify_submit_post_after($event)
+	{
+		$post_data = $event['post_data'];
+
+		if ($post_data['topic_status'] == ITEM_UNLOCKED && $this->request->is_set_post('lock_topic'))
+		{
+			if (($this->auth->acl_get('m_lock', $event['forum_id']) || ($this->auth->acl_get('f_user_lock', $event['forum_id']) && $this->user->data['is_registered'] && !empty($post_data['topic_poster']) && $this->user->data['user_id'] == $post_data['topic_poster'] && $post_data['topic_status'] == ITEM_UNLOCKED)) ? true : false)
+			{
+				$topic_data = array($event['post_data']['topic_id'] => $event['post_data']);
+				$this->move_topics($topic_data, 'move_topics_when_locked');
+			}
+		}
+	}
+
+	/**
 	 * Event: tierra.topicsolved.mark_solved_after
+	 *
+	 * @param Event $event
 	 */
 	public function topic_solved_after($event)
 	{
@@ -185,8 +223,8 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Moves topics to a new forum after they have been locked
 	 *
-	 * @param	array	$topic_data
-	 * @param	string	$action
+	 * @param array $topic_data
+	 * @param string $action
 	 */
 	protected function move_topics($topic_data, $action)
 	{
@@ -224,6 +262,11 @@ class listener implements EventSubscriberInterface
 		if ($forum_id == $to_forum_id)
 		{
 			return;
+		}
+
+		if (!function_exists('phpbb_get_forum_data'))
+		{
+			include($this->root_path . 'includes/functions_mcp.' . $this->php_ext);
 		}
 
 		$to_forum_data = phpbb_get_forum_data($to_forum_id, 'f_post');
