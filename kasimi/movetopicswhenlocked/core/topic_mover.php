@@ -8,33 +8,18 @@
  *
  */
 
-namespace kasimi\movetopicswhenlocked\event;
+namespace kasimi\movetopicswhenlocked\core;
 
-use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class listener implements EventSubscriberInterface
+class topic_mover
 {
 	/** @var \phpbb\user */
 	protected $user;
 
-	/** @var \phpbb\auth\auth */
-	protected $auth;
-
-	/** @var \phpbb\request\request_interface */
-	protected $request;
-
 	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
-	/** @var \phpbb\template\template */
-	protected $template;
-
 	/** @var \phpbb\log\log_interface */
 	protected $log;
-
-	/** @var \phpbb\config\config */
-	protected $config;
 
 	/** @var \phpbb\event\dispatcher_interface */
 	protected $dispatcher;
@@ -49,175 +34,27 @@ class listener implements EventSubscriberInterface
  	 * Constructor
 	 *
 	 * @param \phpbb\user							$user
-	 * @param \phpbb\auth\auth						$auth
-	 * @param \phpbb\request\request_interface		$request
 	 * @param \phpbb\db\driver\driver_interface		$db
-	 * @param \phpbb\template\template				$template
 	 * @param \phpbb\log\log_interface				$log
-	 * @param \phpbb\config\config					$config
 	 * @param \phpbb\event\dispatcher_interface		$dispatcher
 	 * @param string								$root_path
 	 * @param string								$php_ext
 	 */
 	public function __construct(
-		\phpbb\user									$user,
-		\phpbb\auth\auth							$auth,
-		\phpbb\request\request_interface			$request,
-		\phpbb\db\driver\driver_interface			$db,
-		\phpbb\template\template					$template,
-		\phpbb\log\log_interface					$log,
-		\phpbb\config\config						$config,
-		\phpbb\event\dispatcher_interface			$dispatcher,
-													$root_path,
-													$php_ext
+		\phpbb\user							$user,
+		\phpbb\db\driver\driver_interface	$db,
+		\phpbb\log\log_interface			$log,
+		\phpbb\event\dispatcher_interface	$dispatcher,
+											$root_path,
+											$php_ext
 	)
 	{
-		$this->user 								= $user;
-		$this->auth									= $auth;
-		$this->request								= $request;
-		$this->db									= $db;
-		$this->template								= $template;
-		$this->log									= $log;
-		$this->config								= $config;
-		$this->dispatcher							= $dispatcher;
-		$this->root_path							= $root_path;
-		$this->php_ext 								= $php_ext;
-	}
-
-	/**
-	 * Register hooks
-	 */
-	static public function getSubscribedEvents()
-	{
-		return array(
-			'core.acp_manage_forums_display_form'		=> 'acp_manage_forums_display_form',
-			'core.acp_manage_forums_request_data'		=> 'acp_manage_forums_request_data',
-			'core.modify_mcp_modules_display_option'	=> 'mcp_modify_mcp_modules_display_option',
-			'core.mcp_lock_unlock_after'				=> 'mcp_lock_unlock_after',
-			'core.posting_modify_submit_post_after'		=> 'posting_modify_submit_post_after',
-			'tierra.topicsolved.mark_solved_after'		=> 'topic_solved_after',
-		);
-	}
-
-	/**
-	 * Event: core.acp_manage_forums_display_form
-	 *
-	 * @param Event $event
-	 */
-	public function acp_manage_forums_display_form($event)
-	{
-		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'acp_forum_settings');
-
-		$is_edit = $event['action'] == 'edit';
-		$forum_data = $event['forum_data'];
-
-		$this->template->assign_vars(array(
-			'MOVE_TOPICS_WHEN_LOCKED_VERSION'	=> $this->config['kasimi.movetopicswhenlocked.version'],
-			'S_MOVE_TOPICS'						=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
-			'S_MOVE_TOPICS_SOLVED'				=> $is_edit ? $forum_data['move_topics_when_locked_solved'] : false,
-			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
-		));
-	}
-
-	/**
-	 * Event: core.acp_manage_forums_request_data
-	 *
-	 * @param Event $event
-	 */
-	public function acp_manage_forums_request_data($event)
-	{
-		$move_topics = $this->request->variable('move_topics_when_locked', 0);
-		$move_solved_topics = $this->request->variable('move_topics_when_locked_solved', 0);
-		$move_topics_to = $this->request->variable('move_topics_when_locked_to', 0);
-
-		$lock_options = array(
-			'move_topics_when_locked'			=> (int) $move_topics,
-			'move_topics_when_locked_solved'	=> (int) $move_solved_topics,
-			'move_topics_when_locked_to'		=> (int) $move_topics_to,
-		);
-
-		$event['forum_data'] = array_merge($event['forum_data'], $lock_options);
-
-		// Apply this forum's preferences to all sub-forums
-		if ($event['action'] == 'edit' && $this->request->variable('move_topics_when_locked_subforums', 0))
-		{
-			$subforum_ids = array();
-			foreach (get_forum_branch($event['forum_data']['forum_id'], 'children', 'descending', false) as $subforum)
-			{
-				$subforum_ids[] = (int) $subforum['forum_id'];
-			}
-
-			if (!empty($subforum_ids))
-			{
-				$sql_ary = 'UPDATE ' . FORUMS_TABLE . '
-					SET ' . $this->db->sql_build_array('UPDATE', $lock_options) . '
-					WHERE ' . $this->db->sql_in_set('forum_id', $subforum_ids);
-				$this->db->sql_query($sql_ary);
-			}
-		}
-	}
-
-	/**
-	 * Event: core.modify_mcp_modules_display_option
-	 *
-	 * @param Event $event
-	 */
-	public function mcp_modify_mcp_modules_display_option($event)
-	{
-		// Add language for MCP log entries
-		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'info_acp_movetopicswhenlocked');
-	}
-
-	/**
-	 * Event: core.mcp_lock_unlock_after
-	 *
-	 * @param Event $event
-	 */
-	public function mcp_lock_unlock_after($event)
-	{
-		if ($event['action'] == 'lock')
-		{
-			$this->move_topics($event['data'], 'move_topics_when_locked');
-		}
-	}
-
-	/**
-	 * Event: core.posting_modify_submit_post_after
-	 *
-	 * @param Event $event
-	 */
-	public function posting_modify_submit_post_after($event)
-	{
-		$post_data = $event['post_data'];
-
-		if ($post_data['topic_status'] == ITEM_UNLOCKED && $this->request->is_set_post('lock_topic'))
-		{
-			if (($this->auth->acl_get('m_lock', $event['forum_id']) || ($this->auth->acl_get('f_user_lock', $event['forum_id']) && $this->user->data['is_registered'] && !empty($post_data['topic_poster']) && $this->user->data['user_id'] == $post_data['topic_poster'] && $post_data['topic_status'] == ITEM_UNLOCKED)) ? true : false)
-			{
-				$topic_data = array($event['post_data']['topic_id'] => $event['post_data']);
-				$this->move_topics($topic_data, 'move_topics_when_locked');
-			}
-		}
-	}
-
-	/**
-	 * Event: tierra.topicsolved.mark_solved_after
-	 *
-	 * @param Event $event
-	 */
-	public function topic_solved_after($event)
-	{
-		if ($event['column_data']['topic_status'] == ITEM_LOCKED)
-		{
-			if (!function_exists('phpbb_get_topic_data'))
-			{
-				include($this->root_path . 'includes/functions_mcp.' . $this->php_ext);
-			}
-
-			$topic_id = $event['topic_data']['topic_id'];
-			$topic_data = phpbb_get_topic_data(array($topic_id));
-			$this->move_topics($topic_data, 'move_topics_when_locked_solved');
-		}
+		$this->user 		= $user;
+		$this->db			= $db;
+		$this->log			= $log;
+		$this->dispatcher	= $dispatcher;
+		$this->root_path	= $root_path;
+		$this->php_ext 		= $php_ext;
 	}
 
 	/**
@@ -226,7 +63,7 @@ class listener implements EventSubscriberInterface
 	 * @param array $topic_data
 	 * @param string $action
 	 */
-	protected function move_topics($topic_data, $action)
+	public function move_topics($topic_data, $action)
 	{
 		$first_topic_data = reset($topic_data);
 		$is_enabled = (int) $first_topic_data[$action];

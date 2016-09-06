@@ -24,6 +24,6 @@ $lang = array_merge($lang, array(
 	'MOVE_TOPICS_SOLVED'						=> 'Move solved & locked topics automatically',
 	'MOVE_TOPICS_SOLVED_EXPLAIN'				=> 'Requires the <a href="https://www.phpbb.com/customise/db/extension/topic_solved/">Topic Solved extension by bpetty/tierra</a> to be installed.',
 	'MOVE_TOPICS_TO'							=> 'Move locked topics to',
-	'MOVE_TOPICS_APPLY_TO_SUBFORUMS'			=> 'Apply these options to all sub-forums',
+	'MOVE_TOPICS_APPLY_TO_SUBFORUMS'			=> 'Apply these options to all sub-forums now',
 	'MOVE_TOPICS_APPLY_TO_SUBFORUMS_EXPLAIN'	=> 'If set to “Yes”, the above preferences are applied to this forum and all sub-forums (and their sub-forums).',
 ));

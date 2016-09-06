@@ -1,16 +1,39 @@
 services:
-    kasimi.movetopicswhenlocked.listener:
-        class: kasimi\movetopicswhenlocked\event\listener
+    kasimi.movetopicswhenlocked.acp_listener:
+        class: kasimi\movetopicswhenlocked\event\acp_listener
         arguments:
             - '@user'
-            - '@auth'
             - '@request'
             - '@dbal.conn'
             - '@template'
-            - '@log'
             - '@config'
             - '@dispatcher'
+        tags:
+            - { name: event.listener }
+    kasimi.movetopicswhenlocked.main_listener:
+        class: kasimi\movetopicswhenlocked\event\main_listener
+        arguments:
+            - '@kasimi.movetopicswhenlocked.topic_mover'
+            - '@user'
+            - '@auth'
+            - '@request'
             - '%core.root_path%'
             - '%core.php_ext%'
         tags:
             - { name: event.listener }
+    kasimi.movetopicswhenlocked.mcp_listener:
+        class: kasimi\movetopicswhenlocked\event\mcp_listener
+        arguments:
+            - '@kasimi.movetopicswhenlocked.topic_mover'
+            - '@user'
+        tags:
+            - { name: event.listener }
+    kasimi.movetopicswhenlocked.topic_mover:
+        class: kasimi\movetopicswhenlocked\core\topic_mover
+        arguments:
+            - '@user'
+            - '@dbal.conn'
+            - '@log'
+            - '@dispatcher'
+            - '%core.root_path%'
+            - '%core.php_ext%'
