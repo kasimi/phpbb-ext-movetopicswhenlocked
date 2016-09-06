@@ -1,26 +1,32 @@
 {
-	"name": "kasimi/movetopicswhenlocked",
-	"type": "phpbb-extension",
-	"description": "This extension allows the administrator to configure a forum to automatically move locked topics to a designated forum.",
-	"homepage": "https://github.com/kasimi",
-	"version": "1.0.4",
-	"time": "2016-09-05",
-	"license": "GPL-2.0",
-	"authors": [
-		{
-			"name": "kasimi",
-			"email": "",
-			"homepage": "https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=1330603",
-			"role": "Lead Developer"
-		}
-	],
-	"require": {
-		"php": ">=5.3.3"
-	},
-	"extra": {
-		"display-name": "Move Topics When Locked",
-		"soft-require": {
-			"phpbb/phpbb": ">=3.1.7-RC1"
-		}
-	}
+    "name": "kasimi/movetopicswhenlocked",
+    "type": "phpbb-extension",
+    "description": "This extension allows the administrator to configure a forum to automatically move locked topics to a designated forum.",
+    "homepage": "https://github.com/kasimi",
+    "version": "1.0.4",
+    "time": "2016-09-06",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "kasimi",
+            "email": "",
+            "homepage": "https://www.phpbb.com/community/memberlist.php?mode=viewprofile&u=1330603",
+            "role": "Lead Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "phpbb/phpbb": ">=3.1.7-RC1"
+    },
+    "extra": {
+        "display-name": "Move Topics When Locked",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.1.7-RC1"
+        },
+        "version-check": {
+            "host": "www.phpbb.com",
+            "directory": "/customise/db/extension/move_topics_when_locked",
+            "filename": "version_check"
+        }
+    }
 }
