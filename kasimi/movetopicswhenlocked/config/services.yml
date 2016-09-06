@@ -7,7 +7,7 @@ services:
             - '@dbal.conn'
             - '@template'
             - '@config'
-            - '@dispatcher'
+            - '@ext.manager'
         tags:
             - { name: event.listener }
     kasimi.movetopicswhenlocked.main_listener:

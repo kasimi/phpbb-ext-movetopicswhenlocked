@@ -30,6 +30,15 @@ class acp_listener implements EventSubscriberInterface
 	/** @var \phpbb\config\config */
 	protected $config;
 
+	/** @var \phpbb\extension\manager */
+	protected $extension_manager;
+
+	/** @const string */
+	const EXT_TOPIC_SOLVED_NAME = 'tierra/topicsolved';
+
+	/** @const string */
+	const EXT_TOPIC_SOLVED_MIN_VERSION = '2.2.0';
+
 	/**
  	 * Constructor
 	 *
@@ -38,20 +47,23 @@ class acp_listener implements EventSubscriberInterface
 	 * @param \phpbb\db\driver\driver_interface		$db
 	 * @param \phpbb\template\template				$template
 	 * @param \phpbb\config\config					$config
+	 * @param \phpbb\extension\manager				$extension_manager
 	 */
 	public function __construct(
 		\phpbb\user							$user,
 		\phpbb\request\request_interface	$request,
 		\phpbb\db\driver\driver_interface	$db,
 		\phpbb\template\template			$template,
-		\phpbb\config\config				$config
+		\phpbb\config\config				$config,
+		\phpbb\extension\manager			$extension_manager
 	)
 	{
-		$this->user 	= $user;
-		$this->request	= $request;
-		$this->db		= $db;
-		$this->template	= $template;
-		$this->config	= $config;
+		$this->user 				= $user;
+		$this->request				= $request;
+		$this->db					= $db;
+		$this->template				= $template;
+		$this->config				= $config;
+		$this->extension_manager	= $extension_manager;
 	}
 
 	/**
@@ -77,12 +89,31 @@ class acp_listener implements EventSubscriberInterface
 		$is_edit = $event['action'] == 'edit';
 		$forum_data = $event['forum_data'];
 
-		$this->template->assign_vars(array(
+		$template_vars = array(
 			'MOVE_TOPICS_WHEN_LOCKED_VERSION'	=> $this->config['kasimi.movetopicswhenlocked.version'],
 			'S_MOVE_TOPICS'						=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
-			'S_MOVE_TOPICS_SOLVED'				=> $is_edit ? $forum_data['move_topics_when_locked_solved'] : false,
 			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
-		));
+		);
+
+		$topic_solved_extension = $this->user->lang('MOVE_TOPICS_SOLVED_EXTENSION');
+
+		if ($this->extension_manager->is_enabled(self::EXT_TOPIC_SOLVED_NAME))
+		{
+			$metadata = $this->extension_manager->create_extension_metadata_manager(self::EXT_TOPIC_SOLVED_NAME, $this->template)->get_metadata();
+			$is_valid_version = phpbb_version_compare($metadata['version'], self::EXT_TOPIC_SOLVED_MIN_VERSION, '>=');
+
+			$template_vars = array_merge($template_vars, array(
+				'S_MOVE_TOPICS_SOLVED'			=> $is_edit ? $forum_data['move_topics_when_locked_solved'] : false,
+				'MOVE_TOPICS_SOLVED_ENABLED'	=> $is_valid_version ? $this->user->lang('MOVE_TOPICS_SOLVED_ENABLED', $topic_solved_extension) : false,
+				'MOVE_TOPICS_SOLVED_VERSION'	=> $is_valid_version ? false : $this->user->lang('MOVE_TOPICS_SOLVED_VERSION', self::EXT_TOPIC_SOLVED_MIN_VERSION, $topic_solved_extension),
+			));
+		}
+		else
+		{
+			$template_vars['MOVE_TOPICS_SOLVED_DISABLED'] = $this->user->lang('EXTENSION_DISABLED', $topic_solved_extension);
+		}
+
+		$this->template->assign_vars($template_vars);
 	}
 
 	/**

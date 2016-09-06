@@ -9,7 +9,15 @@
 			</dd>
 		</dl>
 		<dl>
-			<dt><label for="move_topics_when_locked_solved">{L_MOVE_TOPICS_SOLVED}{L_COLON}</label><br /><span>{L_MOVE_TOPICS_SOLVED_EXPLAIN}</span></dt>
+			<dt><label for="move_topics_when_locked_solved">{L_MOVE_TOPICS_SOLVED}{L_COLON}</label><br />
+				<!-- IF MOVE_TOPICS_SOLVED_DISABLED -->
+					<span style="color:red">{MOVE_TOPICS_SOLVED_DISABLED}</span>
+				<!-- ELSEIF MOVE_TOPICS_SOLVED_VERSION -->
+					<span style="color:red">{MOVE_TOPICS_SOLVED_VERSION}</span>
+				<!-- ELSEIF MOVE_TOPICS_SOLVED_ENABLED -->
+					<span style="color:green">{MOVE_TOPICS_SOLVED_ENABLED}</span>
+				<!-- ENDIF -->
+			</dt>
 			<dd>
 				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="1"<!-- IF S_MOVE_TOPICS_SOLVED --> id="move_topics_when_locked_solved" checked="checked"<!-- ENDIF --> /> {L_YES}</label>
 				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="0"<!-- IF not S_MOVE_TOPICS_SOLVED --> id="move_topics_when_locked_solved" checked="checked"<!-- ENDIF --> /> {L_NO}</label>
