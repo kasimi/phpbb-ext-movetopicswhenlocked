@@ -27,9 +27,6 @@ class acp_listener implements EventSubscriberInterface
 	/** @var \phpbb\template\template */
 	protected $template;
 
-	/** @var \phpbb\config\config */
-	protected $config;
-
 	/** @var \phpbb\extension\manager */
 	protected $extension_manager;
 
@@ -46,7 +43,6 @@ class acp_listener implements EventSubscriberInterface
 	 * @param \phpbb\request\request_interface		$request
 	 * @param \phpbb\db\driver\driver_interface		$db
 	 * @param \phpbb\template\template				$template
-	 * @param \phpbb\config\config					$config
 	 * @param \phpbb\extension\manager				$extension_manager
 	 */
 	public function __construct(
@@ -54,7 +50,6 @@ class acp_listener implements EventSubscriberInterface
 		\phpbb\request\request_interface	$request,
 		\phpbb\db\driver\driver_interface	$db,
 		\phpbb\template\template			$template,
-		\phpbb\config\config				$config,
 		\phpbb\extension\manager			$extension_manager
 	)
 	{
@@ -62,7 +57,6 @@ class acp_listener implements EventSubscriberInterface
 		$this->request				= $request;
 		$this->db					= $db;
 		$this->template				= $template;
-		$this->config				= $config;
 		$this->extension_manager	= $extension_manager;
 	}
 
@@ -90,7 +84,6 @@ class acp_listener implements EventSubscriberInterface
 		$forum_data = $event['forum_data'];
 
 		$template_vars = array(
-			'MOVE_TOPICS_WHEN_LOCKED_VERSION'	=> $this->config['kasimi.movetopicswhenlocked.version'],
 			'S_MOVE_TOPICS'						=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
 			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
 		);

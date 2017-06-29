@@ -6,7 +6,6 @@ services:
             - '@request'
             - '@dbal.conn'
             - '@template'
-            - '@config'
             - '@ext.manager'
         tags:
             - { name: event.listener }
