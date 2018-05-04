@@ -68,6 +68,11 @@ class topic_mover
 	 */
 	public function move_topics(array $topic_data, $action)
 	{
+		if (!$topic_data)
+		{
+			return;
+		}
+
 		$first_topic_data = reset($topic_data);
 		$is_enabled = (int) $first_topic_data[$action];
 		$to_forum_id = (int) $first_topic_data['move_topics_when_locked_to'];
