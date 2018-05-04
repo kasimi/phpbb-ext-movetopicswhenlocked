@@ -13,15 +13,15 @@ namespace kasimi\movetopicswhenlocked\event;
 use phpbb\db\driver\driver_interface;
 use phpbb\event\data;
 use phpbb\extension\manager;
+use phpbb\language\language;
 use phpbb\request\request_interface;
 use phpbb\template\template;
-use phpbb\user;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class acp_listener implements EventSubscriberInterface
 {
-	/** @var user */
-	protected $user;
+	/** @var language */
+	protected $lang;
 
 	/** @var request_interface */
 	protected $request;
@@ -50,21 +50,21 @@ class acp_listener implements EventSubscriberInterface
 	];
 
 	/**
-	 * @param user				$user
+	 * @param language			$lang
 	 * @param request_interface	$request
 	 * @param driver_interface	$db
 	 * @param template			$template
 	 * @param manager			$extension_manager
 	 */
 	public function __construct(
-		user $user,
+		language $lang,
 		request_interface $request,
 		driver_interface $db,
 		template $template,
 		manager $extension_manager
 	)
 	{
-		$this->user 				= $user;
+		$this->lang 				= $lang;
 		$this->request				= $request;
 		$this->db					= $db;
 		$this->template				= $template;
@@ -87,7 +87,7 @@ class acp_listener implements EventSubscriberInterface
 	 */
 	public function acp_manage_forums_display_form($event)
 	{
-		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'acp_forum_settings');
+		$this->lang->add_lang('acp_forum_settings', 'kasimi/movetopicswhenlocked');
 
 		$is_edit = $event['action'] == 'edit';
 		$forum_data = $event['forum_data'];
@@ -99,7 +99,7 @@ class acp_listener implements EventSubscriberInterface
 
 		foreach ($this->compatible_extensions as $ext_key => $ext)
 		{
-			$full_name = $this->user->lang('MOVE_' . $ext_key . '_EXTENSION');
+			$full_name = $this->lang->lang('MOVE_' . $ext_key . '_EXTENSION');
 
 			if ($this->extension_manager->is_enabled($ext['name']))
 			{
@@ -108,14 +108,14 @@ class acp_listener implements EventSubscriberInterface
 
 				$template_vars = array_merge($template_vars, [
 					'S_MOVE_' . $ext_key			=> $is_edit ? $forum_data[$ext['row_key']] : false,
-					'MOVE_' . $ext_key . '_ENABLED'	=> $is_valid_version ? $this->user->lang('MOVE_EXTENSION_ENABLED', $full_name) : false,
-					'MOVE_' . $ext_key . '_VERSION'	=> $is_valid_version ? false : $this->user->lang('MOVE_EXTENSION_VERSION', $ext['min_version'], $full_name),
+					'MOVE_' . $ext_key . '_ENABLED'	=> $is_valid_version ? $this->lang->lang('MOVE_EXTENSION_ENABLED', $full_name) : false,
+					'MOVE_' . $ext_key . '_VERSION'	=> $is_valid_version ? false : $this->lang->lang('MOVE_EXTENSION_VERSION', $ext['min_version'], $full_name),
 				]);
 			}
 			else
 			{
 				$template_vars = array_merge($template_vars, [
-					'MOVE_' . $ext_key . '_DISABLED' => $this->user->lang('EXTENSION_DISABLED', $full_name),
+					'MOVE_' . $ext_key . '_DISABLED' => $this->lang->lang('EXTENSION_DISABLED', $full_name),
 				]);
 			}
 		}

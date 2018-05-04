@@ -12,7 +12,7 @@ namespace kasimi\movetopicswhenlocked\event;
 
 use kasimi\movetopicswhenlocked\core\topic_mover;
 use phpbb\event\data;
-use phpbb\user;
+use phpbb\language\language;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class mcp_listener implements EventSubscriberInterface
@@ -20,20 +20,20 @@ class mcp_listener implements EventSubscriberInterface
 	/** @var topic_mover */
 	protected $topic_mover;
 
-	/** @var user */
-	protected $user;
+	/** @var language */
+	protected $lang;
 
 	/**
 	 * @param topic_mover	$topic_mover
-	 * @param user			$user
+	 * @param language		$lang
 	 */
 	public function __construct(
 		topic_mover $topic_mover,
-		user $user
+		language $lang
 	)
 	{
 		$this->topic_mover	= $topic_mover;
-		$this->user 		= $user;
+		$this->lang 		= $lang;
 	}
 
 	/**
@@ -53,7 +53,7 @@ class mcp_listener implements EventSubscriberInterface
 	public function mcp_modify_mcp_modules_display_option()
 	{
 		// Add language for MCP log entries
-		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'info_acp_movetopicswhenlocked');
+		$this->lang->add_lang('info_acp_movetopicswhenlocked', 'kasimi/movetopicswhenlocked');
 	}
 
 	/**

@@ -2,7 +2,7 @@ services:
     kasimi.movetopicswhenlocked.acp_listener:
         class: kasimi\movetopicswhenlocked\event\acp_listener
         arguments:
-            - '@user'
+            - '@language'
             - '@request'
             - '@dbal.conn'
             - '@template'
@@ -24,7 +24,7 @@ services:
         class: kasimi\movetopicswhenlocked\event\mcp_listener
         arguments:
             - '@kasimi.movetopicswhenlocked.topic_mover'
-            - '@user'
+            - '@language'
         tags:
             - { name: event.listener }
     kasimi.movetopicswhenlocked.topic_mover:
