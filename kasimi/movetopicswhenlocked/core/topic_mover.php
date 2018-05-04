@@ -82,7 +82,7 @@ class topic_mover
 		 *
 		 * @event kasimi.movetopicswhenlocked.move_topics_before
 		 * @var	array	topic_data		Array with general topic data
-		 * @var	string	action			Who triggered the forums to be moved, one of move_topics_when_locked|move_topics_when_locked_solved
+		 * @var	string	action			Who triggered the forums to be moved, one of move_topics_when_locked|move_topics_when_locked_solved|move_topics_when_locked_auto
 		 * @var int		is_enabled		Whether or not the forum's ACP settings specify the topics to be moved
 		 * @var int		to_forum_id		The destination forum
 		 * @since 1.0.2
@@ -222,7 +222,7 @@ class topic_mover
 		 *
 		 * @event kasimi.movetopicswhenlocked.move_topics_after
 		 * @var	array	topic_data					Array with general topic data
-		 * @var string	action						Who triggered the forums to be moved, one of move_topics_when_locked|move_topics_when_locked_solved
+		 * @var string	action						Who triggered the forums to be moved, one of move_topics_when_locked|move_topics_when_locked_solved|move_topics_when_locked_auto
 		 * @var int		to_forum_id					The destination forum
 		 * @var int		topics_moved				Number of moved topics
 		 * @var int		topics_moved_unapproved		Number of moved unapproved topics

@@ -68,8 +68,9 @@ class main_listener implements EventSubscriberInterface
 	public static function getSubscribedEvents()
 	{
 		return [
-			'core.posting_modify_submit_post_after'	=> 'posting_modify_submit_post_after',
-			'tierra.topicsolved.mark_solved_after'	=> 'topic_solved_after',
+			'core.posting_modify_submit_post_after'				=> 'posting_modify_submit_post_after',
+			'tierra.topicsolved.mark_solved_after'				=> 'topic_solved_after',
+			'alfredoramos.autolocktopics.topics_locked_after'	=> 'topics_locked_after',
 		];
 	}
 
@@ -101,6 +102,15 @@ class main_listener implements EventSubscriberInterface
 			$topic_data = $this->get_topic_data([$topic_id]);
 			$this->topic_mover->move_topics($topic_data, 'move_topics_when_locked_solved');
 		}
+	}
+
+	/**
+	 * @param data $event
+	 */
+	public function topics_locked_after($event)
+	{
+		$topic_data = $this->get_topic_data($event['topic_ids']);
+		$this->topic_mover->move_topics($topic_data, 'move_topics_when_locked_auto');
 	}
 
 	/**

@@ -35,11 +35,19 @@ class acp_listener implements EventSubscriberInterface
 	/** @var manager */
 	protected $extension_manager;
 
-	/** @const string */
-	const EXT_TOPIC_SOLVED_NAME = 'tierra/topicsolved';
-
-	/** @const string */
-	const EXT_TOPIC_SOLVED_MIN_VERSION = '2.2.0';
+	/** @var array */
+	protected $compatible_extensions = [
+		'TOPICS_SOLVED' => [
+			'name'			=> 'tierra/topicsolved',
+			'min_version'	=> '2.2.0',
+			'row_key'		=> 'move_topics_when_locked_solved',
+		],
+		'AUTO_LOCK' => [
+			'name'			=> 'alfredoramos/autolocktopics',
+			'min_version'	=> '1.1.0',
+			'row_key'		=> 'move_topics_when_locked_auto',
+		],
+	];
 
 	/**
 	 * @param user				$user
@@ -89,22 +97,27 @@ class acp_listener implements EventSubscriberInterface
 			'S_MOVE_TOPICS_TO_OPTIONS'	=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
 		];
 
-		$topic_solved_extension = $this->user->lang('MOVE_TOPICS_SOLVED_EXTENSION');
-
-		if ($this->extension_manager->is_enabled(self::EXT_TOPIC_SOLVED_NAME))
+		foreach ($this->compatible_extensions as $ext_key => $ext)
 		{
-			$metadata = $this->extension_manager->create_extension_metadata_manager(self::EXT_TOPIC_SOLVED_NAME, $this->template)->get_metadata();
-			$is_valid_version = phpbb_version_compare($metadata['version'], self::EXT_TOPIC_SOLVED_MIN_VERSION, '>=');
+			$full_name = $this->user->lang('MOVE_' . $ext_key . '_EXTENSION');
 
-			$template_vars = array_merge($template_vars, [
-				'S_MOVE_TOPICS_SOLVED'			=> $is_edit ? $forum_data['move_topics_when_locked_solved'] : false,
-				'MOVE_TOPICS_SOLVED_ENABLED'	=> $is_valid_version ? $this->user->lang('MOVE_TOPICS_SOLVED_ENABLED', $topic_solved_extension) : false,
-				'MOVE_TOPICS_SOLVED_VERSION'	=> $is_valid_version ? false : $this->user->lang('MOVE_TOPICS_SOLVED_VERSION', self::EXT_TOPIC_SOLVED_MIN_VERSION, $topic_solved_extension),
-			]);
-		}
-		else
-		{
-			$template_vars['MOVE_TOPICS_SOLVED_DISABLED'] = $this->user->lang('EXTENSION_DISABLED', $topic_solved_extension);
+			if ($this->extension_manager->is_enabled($ext['name']))
+			{
+				$metadata = $this->extension_manager->create_extension_metadata_manager($ext['name'])->get_metadata();
+				$is_valid_version = phpbb_version_compare($metadata['version'], $ext['min_version'], '>=');
+
+				$template_vars = array_merge($template_vars, [
+					'S_MOVE_' . $ext_key			=> $is_edit ? $forum_data[$ext['row_key']] : false,
+					'MOVE_' . $ext_key . '_ENABLED'	=> $is_valid_version ? $this->user->lang('MOVE_EXTENSION_ENABLED', $full_name) : false,
+					'MOVE_' . $ext_key . '_VERSION'	=> $is_valid_version ? false : $this->user->lang('MOVE_EXTENSION_VERSION', $ext['min_version'], $full_name),
+				]);
+			}
+			else
+			{
+				$template_vars = array_merge($template_vars, [
+					'MOVE_' . $ext_key . '_DISABLED' => $this->user->lang('EXTENSION_DISABLED', $full_name),
+				]);
+			}
 		}
 
 		$this->template->assign_vars($template_vars);
@@ -118,6 +131,7 @@ class acp_listener implements EventSubscriberInterface
 		$lock_options = [
 			'move_topics_when_locked'			=> $this->request->variable('move_topics_when_locked', 0),
 			'move_topics_when_locked_solved'	=> $this->request->variable('move_topics_when_locked_solved', 0),
+			'move_topics_when_locked_auto'		=> $this->request->variable('move_topics_when_locked_auto', 0),
 			'move_topics_when_locked_to'		=> $this->request->variable('move_topics_when_locked_to', 0),
 		];
 

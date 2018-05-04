@@ -24,6 +24,21 @@
 			</dd>
 		</dl>
 		<dl>
+			<dt><label for="move_topics_when_locked_auto">{{ lang('MOVE_AUTO_LOCK') ~ lang('COLON') }}</label><br />
+				{% if MOVE_AUTO_LOCK_DISABLED %}
+					<span style="color:red">{{ MOVE_AUTO_LOCK_DISABLED }}</span>
+				{% elseif MOVE_AUTO_LOCK_VERSION %}
+					<span style="color:red">{{ MOVE_AUTO_LOCK_VERSION }}</span>
+				{% elseif MOVE_AUTO_LOCK_ENABLED %}
+					<span style="color:green">{{ MOVE_AUTO_LOCK_ENABLED }}</span>
+				{% endif %}
+			</dt>
+			<dd>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_auto" value="1"{{ S_MOVE_AUTO_LOCK ? ' id="move_topics_when_locked_auto" checked="checked"' : '' }} /> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_auto" value="0"{{ not S_MOVE_AUTO_LOCK ? ' id="move_topics_when_locked_auto" checked="checked"' : '' }} /> {{ lang('NO') }}</label>
+			</dd>
+		</dl>
+		<dl>
 			<dt><label for="move_topics_when_locked_to">{{ lang('MOVE_TOPICS_TO') ~ lang('COLON') }}</label></dt>
 			<dd>
 				<select id="move_topics_when_locked_to" name="move_topics_when_locked_to">{{ S_MOVE_TOPICS_TO_OPTIONS }}</select>
