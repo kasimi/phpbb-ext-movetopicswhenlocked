@@ -10,18 +10,23 @@
 
 namespace kasimi\movetopicswhenlocked\core;
 
+use phpbb\db\driver\driver_interface;
+use phpbb\event\dispatcher_interface;
+use phpbb\log\log_interface;
+use phpbb\user;
+
 class topic_mover
 {
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
-	/** @var \phpbb\db\driver\driver_interface */
+	/** @var driver_interface */
 	protected $db;
 
-	/** @var \phpbb\log\log_interface */
+	/** @var log_interface */
 	protected $log;
 
-	/** @var \phpbb\event\dispatcher_interface */
+	/** @var dispatcher_interface */
 	protected $dispatcher;
 
 	/** @var string */
@@ -31,22 +36,20 @@ class topic_mover
 	protected $php_ext;
 
 	/**
- 	 * Constructor
-	 *
-	 * @param \phpbb\user							$user
-	 * @param \phpbb\db\driver\driver_interface		$db
-	 * @param \phpbb\log\log_interface				$log
-	 * @param \phpbb\event\dispatcher_interface		$dispatcher
-	 * @param string								$root_path
-	 * @param string								$php_ext
+	 * @param user					$user
+	 * @param driver_interface		$db
+	 * @param log_interface			$log
+	 * @param dispatcher_interface	$dispatcher
+	 * @param string				$root_path
+	 * @param string				$php_ext
 	 */
 	public function __construct(
-		\phpbb\user							$user,
-		\phpbb\db\driver\driver_interface	$db,
-		\phpbb\log\log_interface			$log,
-		\phpbb\event\dispatcher_interface	$dispatcher,
-											$root_path,
-											$php_ext
+		user $user,
+		driver_interface $db,
+		log_interface $log,
+		dispatcher_interface $dispatcher,
+		$root_path,
+		$php_ext
 	)
 	{
 		$this->user 		= $user;
@@ -63,7 +66,7 @@ class topic_mover
 	 * @param array $topic_data
 	 * @param string $action
 	 */
-	public function move_topics($topic_data, $action)
+	public function move_topics(array $topic_data, $action)
 	{
 		$first_topic_data = reset($topic_data);
 		$is_enabled = (int) $first_topic_data[$action];

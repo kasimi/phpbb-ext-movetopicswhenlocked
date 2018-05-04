@@ -10,26 +10,26 @@
 
 namespace kasimi\movetopicswhenlocked\event;
 
-use Symfony\Component\EventDispatcher\Event;
+use kasimi\movetopicswhenlocked\core\topic_mover;
+use phpbb\event\data;
+use phpbb\user;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class mcp_listener implements EventSubscriberInterface
 {
-	/** @var \kasimi\movetopicswhenlocked\core\topic_mover */
+	/** @var topic_mover */
 	protected $topic_mover;
 
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
 	/**
- 	 * Constructor
-	 *
-	 * @param \kasimi\movetopicswhenlocked\core\topic_mover	$topic_mover
-	 * @param \phpbb\user									$user
+	 * @param topic_mover	$topic_mover
+	 * @param user			$user
 	 */
 	public function __construct(
-		\kasimi\movetopicswhenlocked\core\topic_mover	$topic_mover,
-		\phpbb\user										$user
+		topic_mover $topic_mover,
+		user $user
 	)
 	{
 		$this->topic_mover	= $topic_mover;
@@ -37,9 +37,9 @@ class mcp_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Register hooks
+	 * @return array
 	 */
-	static public function getSubscribedEvents()
+	public static function getSubscribedEvents()
 	{
 		return [
 			'core.modify_mcp_modules_display_option'	=> 'mcp_modify_mcp_modules_display_option',
@@ -48,20 +48,16 @@ class mcp_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Event: core.modify_mcp_modules_display_option
 	 *
-	 * @param Event $event
 	 */
-	public function mcp_modify_mcp_modules_display_option($event)
+	public function mcp_modify_mcp_modules_display_option()
 	{
 		// Add language for MCP log entries
 		$this->user->add_lang_ext('kasimi/movetopicswhenlocked', 'info_acp_movetopicswhenlocked');
 	}
 
 	/**
-	 * Event: core.mcp_lock_unlock_after
-	 *
-	 * @param Event $event
+	 * @param data $event
 	 */
 	public function mcp_lock_unlock_after($event)
 	{

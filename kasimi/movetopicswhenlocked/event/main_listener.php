@@ -10,21 +10,25 @@
 
 namespace kasimi\movetopicswhenlocked\event;
 
+use kasimi\movetopicswhenlocked\core\topic_mover;
+use phpbb\auth\auth;
 use phpbb\event\data;
+use phpbb\request\request_interface;
+use phpbb\user;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class main_listener implements EventSubscriberInterface
 {
-	/** @var \kasimi\movetopicswhenlocked\core\topic_mover */
+	/** @var topic_mover */
 	protected $topic_mover;
 
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
-	/** @var \phpbb\auth\auth */
+	/** @var auth */
 	protected $auth;
 
-	/** @var \phpbb\request\request_interface */
+	/** @var request_interface */
 	protected $request;
 
 	/** @var string */
@@ -34,22 +38,20 @@ class main_listener implements EventSubscriberInterface
 	protected $php_ext;
 
 	/**
- 	 * Constructor
-	 *
-	 * @param \kasimi\movetopicswhenlocked\core\topic_mover	$topic_mover
-	 * @param \phpbb\user									$user
-	 * @param \phpbb\auth\auth								$auth
-	 * @param \phpbb\request\request_interface				$request
-	 * @param string										$root_path
-	 * @param string										$php_ext
+	 * @param topic_mover		$topic_mover
+	 * @param user				$user
+	 * @param auth				$auth
+	 * @param request_interface	$request
+	 * @param string			$root_path
+	 * @param string			$php_ext
 	 */
 	public function __construct(
-		\kasimi\movetopicswhenlocked\core\topic_mover	$topic_mover,
-		\phpbb\user										$user,
-		\phpbb\auth\auth								$auth,
-		\phpbb\request\request_interface				$request,
-														$root_path,
-														$php_ext
+		topic_mover	$topic_mover,
+		user $user,
+		auth $auth,
+		request_interface $request,
+		$root_path,
+		$php_ext
 	)
 	{
 		$this->topic_mover	= $topic_mover;
@@ -61,7 +63,7 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Register hooks
+	 * @return array
 	 */
 	public static function getSubscribedEvents()
 	{
@@ -72,8 +74,6 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Event: core.posting_modify_submit_post_after
-	 *
 	 * @param data $event
 	 */
 	public function posting_modify_submit_post_after($event)
@@ -91,8 +91,6 @@ class main_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Event: tierra.topicsolved.mark_solved_after
-	 *
 	 * @param data $event
 	 */
 	public function topic_solved_after($event)

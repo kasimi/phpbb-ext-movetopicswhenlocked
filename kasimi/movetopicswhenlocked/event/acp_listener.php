@@ -10,24 +10,29 @@
 
 namespace kasimi\movetopicswhenlocked\event;
 
-use Symfony\Component\EventDispatcher\Event;
+use phpbb\db\driver\driver_interface;
+use phpbb\event\data;
+use phpbb\extension\manager;
+use phpbb\request\request_interface;
+use phpbb\template\template;
+use phpbb\user;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class acp_listener implements EventSubscriberInterface
 {
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
-	/** @var \phpbb\request\request_interface */
+	/** @var request_interface */
 	protected $request;
 
-	/** @var \phpbb\db\driver\driver_interface */
+	/** @var driver_interface */
 	protected $db;
 
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
 
-	/** @var \phpbb\extension\manager */
+	/** @var manager */
 	protected $extension_manager;
 
 	/** @const string */
@@ -37,20 +42,18 @@ class acp_listener implements EventSubscriberInterface
 	const EXT_TOPIC_SOLVED_MIN_VERSION = '2.2.0';
 
 	/**
- 	 * Constructor
-	 *
-	 * @param \phpbb\user							$user
-	 * @param \phpbb\request\request_interface		$request
-	 * @param \phpbb\db\driver\driver_interface		$db
-	 * @param \phpbb\template\template				$template
-	 * @param \phpbb\extension\manager				$extension_manager
+	 * @param user				$user
+	 * @param request_interface	$request
+	 * @param driver_interface	$db
+	 * @param template			$template
+	 * @param manager			$extension_manager
 	 */
 	public function __construct(
-		\phpbb\user							$user,
-		\phpbb\request\request_interface	$request,
-		\phpbb\db\driver\driver_interface	$db,
-		\phpbb\template\template			$template,
-		\phpbb\extension\manager			$extension_manager
+		user $user,
+		request_interface $request,
+		driver_interface $db,
+		template $template,
+		manager $extension_manager
 	)
 	{
 		$this->user 				= $user;
@@ -61,9 +64,9 @@ class acp_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Register hooks
+	 * @return array
 	 */
-	static public function getSubscribedEvents()
+	public static function getSubscribedEvents()
 	{
 		return [
 			'core.acp_manage_forums_display_form'	=> 'acp_manage_forums_display_form',
@@ -72,9 +75,7 @@ class acp_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Event: core.acp_manage_forums_display_form
-	 *
-	 * @param Event $event
+	 * @param data $event
 	 */
 	public function acp_manage_forums_display_form($event)
 	{
@@ -84,8 +85,8 @@ class acp_listener implements EventSubscriberInterface
 		$forum_data = $event['forum_data'];
 
 		$template_vars = [
-			'S_MOVE_TOPICS'						=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
-			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
+			'S_MOVE_TOPICS'				=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
+			'S_MOVE_TOPICS_TO_OPTIONS'	=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
 		];
 
 		$topic_solved_extension = $this->user->lang('MOVE_TOPICS_SOLVED_EXTENSION');
@@ -110,9 +111,7 @@ class acp_listener implements EventSubscriberInterface
 	}
 
 	/**
-	 * Event: core.acp_manage_forums_request_data
-	 *
-	 * @param Event $event
+	 * @param data $event
 	 */
 	public function acp_manage_forums_request_data($event)
 	{
