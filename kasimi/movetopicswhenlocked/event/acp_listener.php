@@ -65,10 +65,10 @@ class acp_listener implements EventSubscriberInterface
 	 */
 	static public function getSubscribedEvents()
 	{
-		return array(
+		return [
 			'core.acp_manage_forums_display_form'	=> 'acp_manage_forums_display_form',
 			'core.acp_manage_forums_request_data'	=> 'acp_manage_forums_request_data',
-		);
+		];
 	}
 
 	/**
@@ -83,10 +83,10 @@ class acp_listener implements EventSubscriberInterface
 		$is_edit = $event['action'] == 'edit';
 		$forum_data = $event['forum_data'];
 
-		$template_vars = array(
+		$template_vars = [
 			'S_MOVE_TOPICS'						=> $is_edit ? $forum_data['move_topics_when_locked'] : false,
 			'S_MOVE_TOPICS_TO_OPTIONS'			=> make_forum_select($is_edit ? $forum_data['move_topics_when_locked_to'] : false, false, false, true),
-		);
+		];
 
 		$topic_solved_extension = $this->user->lang('MOVE_TOPICS_SOLVED_EXTENSION');
 
@@ -95,11 +95,11 @@ class acp_listener implements EventSubscriberInterface
 			$metadata = $this->extension_manager->create_extension_metadata_manager(self::EXT_TOPIC_SOLVED_NAME, $this->template)->get_metadata();
 			$is_valid_version = phpbb_version_compare($metadata['version'], self::EXT_TOPIC_SOLVED_MIN_VERSION, '>=');
 
-			$template_vars = array_merge($template_vars, array(
+			$template_vars = array_merge($template_vars, [
 				'S_MOVE_TOPICS_SOLVED'			=> $is_edit ? $forum_data['move_topics_when_locked_solved'] : false,
 				'MOVE_TOPICS_SOLVED_ENABLED'	=> $is_valid_version ? $this->user->lang('MOVE_TOPICS_SOLVED_ENABLED', $topic_solved_extension) : false,
 				'MOVE_TOPICS_SOLVED_VERSION'	=> $is_valid_version ? false : $this->user->lang('MOVE_TOPICS_SOLVED_VERSION', self::EXT_TOPIC_SOLVED_MIN_VERSION, $topic_solved_extension),
-			));
+			]);
 		}
 		else
 		{
@@ -116,11 +116,11 @@ class acp_listener implements EventSubscriberInterface
 	 */
 	public function acp_manage_forums_request_data($event)
 	{
-		$lock_options = array(
+		$lock_options = [
 			'move_topics_when_locked'			=> $this->request->variable('move_topics_when_locked', 0),
 			'move_topics_when_locked_solved'	=> $this->request->variable('move_topics_when_locked_solved', 0),
 			'move_topics_when_locked_to'		=> $this->request->variable('move_topics_when_locked_to', 0),
-		);
+		];
 
 		$event['forum_data'] = array_merge($event['forum_data'], $lock_options);
 
@@ -147,7 +147,7 @@ class acp_listener implements EventSubscriberInterface
 	 */
 	protected function get_subforum_ids($forum_id)
 	{
-		$subforum_ids = array();
+		$subforum_ids = [];
 
 		foreach (get_forum_branch((int) $forum_id, 'children', 'descending', false) as $subforum)
 		{

@@ -15,9 +15,9 @@ if (!defined('IN_PHPBB'))
 
 if (empty($lang) || !is_array($lang))
 {
-	$lang = array();
+	$lang = [];
 }
 
-$lang = array_merge($lang, array(
+$lang = array_merge($lang, [
 	'LOG_MOVED_LOCKED_TOPIC' => '<strong>Locked topic “%s” automatically moved</strong><br />&raquo; from %s<br />&raquo; to %s',
-));
+]);

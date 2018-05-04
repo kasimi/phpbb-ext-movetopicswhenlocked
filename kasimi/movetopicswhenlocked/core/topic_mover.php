@@ -79,12 +79,12 @@ class topic_mover
 		 * @var int		to_forum_id		The destination forum
 		 * @since 1.0.2
 		 */
-		$vars = array(
+		$vars = [
 			'topic_data',
 			'action',
 			'is_enabled',
 			'to_forum_id',
-		);
+		];
 		extract($this->dispatcher->trigger_event('kasimi.movetopicswhenlocked.move_topics_before', compact($vars)));
 
 		// Forum settings are set to not move the topics
@@ -152,16 +152,16 @@ class topic_mover
 		{
 			// We add the $to_forum_id twice, because 'forum_id' is updated
 			// when the topic is moved again later.
-			$this->log->add('mod', $this->user->data['user_id'], $this->user->ip, 'LOG_MOVED_LOCKED_TOPIC', false, array(
+			$this->log->add('mod', $this->user->data['user_id'], $this->user->ip, 'LOG_MOVED_LOCKED_TOPIC', false, [
 				'forum_id'		=> (int) $to_forum_id,
 				'topic_id'		=> (int) $topic_id,
 				$row['topic_title'],
 				$row['forum_name'],
 				$to_forum_data[$to_forum_id]['forum_name'],
-			));
+			]);
 		}
 
-		$sync_sql = array();
+		$sync_sql = [];
 		if ($posts_moved)
 		{
 			$sync_sql[$to_forum_id][] = 'forum_posts_approved = forum_posts_approved + ' . (int) $posts_moved;
@@ -207,7 +207,7 @@ class topic_mover
 
 		$this->db->sql_transaction('commit');
 
-		sync('forum', 'forum_id', array($forum_id, $to_forum_id));
+		sync('forum', 'forum_id', [$forum_id, $to_forum_id]);
 
 		/**
 		 * This event allows you to perform additional actions after locked topics have been moved.
@@ -224,7 +224,7 @@ class topic_mover
 		 * @var int		posts_moved_softdeleted		Number of moved soft-deleted posts
 		 * @since 1.0.2
 		 */
-		$vars = array(
+		$vars = [
 			'topic_data',
 			'action',
 			'to_forum_id',
@@ -234,7 +234,7 @@ class topic_mover
 			'posts_moved',
 			'posts_moved_unapproved',
 			'posts_moved_softdeleted',
-		);
+		];
 		extract($this->dispatcher->trigger_event('kasimi.movetopicswhenlocked.move_topics_after', compact($vars)));
 
 		unset($topic_data);

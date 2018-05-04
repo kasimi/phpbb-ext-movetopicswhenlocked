@@ -10,7 +10,7 @@
 
 namespace kasimi\movetopicswhenlocked\event;
 
-use Symfony\Component\EventDispatcher\Event;
+use phpbb\event\data;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class main_listener implements EventSubscriberInterface
@@ -63,18 +63,18 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Register hooks
 	 */
-	static public function getSubscribedEvents()
+	public static function getSubscribedEvents()
 	{
-		return array(
+		return [
 			'core.posting_modify_submit_post_after'	=> 'posting_modify_submit_post_after',
 			'tierra.topicsolved.mark_solved_after'	=> 'topic_solved_after',
-		);
+		];
 	}
 
 	/**
 	 * Event: core.posting_modify_submit_post_after
 	 *
-	 * @param Event $event
+	 * @param data $event
 	 */
 	public function posting_modify_submit_post_after($event)
 	{
@@ -84,7 +84,7 @@ class main_listener implements EventSubscriberInterface
 		{
 			if (($this->auth->acl_get('m_lock', $event['forum_id']) || ($this->auth->acl_get('f_user_lock', $event['forum_id']) && $this->user->data['is_registered'] && !empty($post_data['topic_poster']) && $this->user->data['user_id'] == $post_data['topic_poster'] && $post_data['topic_status'] == ITEM_UNLOCKED)) ? true : false)
 			{
-				$topic_data = array($event['post_data']['topic_id'] => $event['post_data']);
+				$topic_data = [$event['post_data']['topic_id'] => $event['post_data']];
 				$this->topic_mover->move_topics($topic_data, 'move_topics_when_locked');
 			}
 		}
@@ -93,7 +93,7 @@ class main_listener implements EventSubscriberInterface
 	/**
 	 * Event: tierra.topicsolved.mark_solved_after
 	 *
-	 * @param Event $event
+	 * @param data $event
 	 */
 	public function topic_solved_after($event)
 	{
@@ -105,7 +105,7 @@ class main_listener implements EventSubscriberInterface
 			}
 
 			$topic_id = $event['topic_data']['topic_id'];
-			$topic_data = phpbb_get_topic_data(array($topic_id));
+			$topic_data = phpbb_get_topic_data([$topic_id]);
 			$this->topic_mover->move_topics($topic_data, 'move_topics_when_locked_solved');
 		}
 	}

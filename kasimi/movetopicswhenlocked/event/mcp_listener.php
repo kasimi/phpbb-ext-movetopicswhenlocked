@@ -41,10 +41,10 @@ class mcp_listener implements EventSubscriberInterface
 	 */
 	static public function getSubscribedEvents()
 	{
-		return array(
+		return [
 			'core.modify_mcp_modules_display_option'	=> 'mcp_modify_mcp_modules_display_option',
 			'core.mcp_lock_unlock_after'				=> 'mcp_lock_unlock_after',
-		);
+		];
 	}
 
 	/**
