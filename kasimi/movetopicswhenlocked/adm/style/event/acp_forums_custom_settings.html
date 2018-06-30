@@ -4,8 +4,8 @@
 		<dl>
 			<dt><label for="move_topics_when_locked">{{ lang('MOVE_TOPICS') ~ lang('COLON') }}</label></dt>
 			<dd>
-				<label><input type="radio" class="radio" name="move_topics_when_locked" value="1"{{ S_MOVE_TOPICS ? ' id="move_topics_when_locked" checked="checked"' : '' }}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="move_topics_when_locked" value="0"{{ not S_MOVE_TOPICS ? ' id="move_topics_when_locked" checked="checked"' : '' }}> {{ lang('NO') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked" value="1"{{ S_MOVE_TOPICS ? ' id="move_topics_when_locked" checked="checked"' }}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked" value="0"{{ not S_MOVE_TOPICS ? ' id="move_topics_when_locked" checked="checked"' }}> {{ lang('NO') }}</label>
 			</dd>
 		</dl>
 		<dl>
@@ -19,8 +19,8 @@
 				{% endif %}
 			</dt>
 			<dd>
-				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="1"{{ S_MOVE_TOPICS_SOLVED ? ' id="move_topics_when_locked_solved" checked="checked"' : '' }}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="0"{{ not S_MOVE_TOPICS_SOLVED ? ' id="move_topics_when_locked_solved" checked="checked"' : '' }}> {{ lang('NO') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="1"{{ S_MOVE_TOPICS_SOLVED ? ' id="move_topics_when_locked_solved" checked="checked"' }}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_solved" value="0"{{ not S_MOVE_TOPICS_SOLVED ? ' id="move_topics_when_locked_solved" checked="checked"' }}> {{ lang('NO') }}</label>
 			</dd>
 		</dl>
 		<dl>
@@ -34,8 +34,8 @@
 				{% endif %}
 			</dt>
 			<dd>
-				<label><input type="radio" class="radio" name="move_topics_when_locked_auto" value="1"{{ S_MOVE_AUTO_LOCK ? ' id="move_topics_when_locked_auto" checked="checked"' : '' }}> {{ lang('YES') }}</label>
-				<label><input type="radio" class="radio" name="move_topics_when_locked_auto" value="0"{{ not S_MOVE_AUTO_LOCK ? ' id="move_topics_when_locked_auto" checked="checked"' : '' }}> {{ lang('NO') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_auto" value="1"{{ S_MOVE_AUTO_LOCK ? ' id="move_topics_when_locked_auto" checked="checked"' }}> {{ lang('YES') }}</label>
+				<label><input type="radio" class="radio" name="move_topics_when_locked_auto" value="0"{{ not S_MOVE_AUTO_LOCK ? ' id="move_topics_when_locked_auto" checked="checked"' }}> {{ lang('NO') }}</label>
 			</dd>
 		</dl>
 		<dl>
